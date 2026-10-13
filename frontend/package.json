@@ -1,0 +1,49 @@
+{
+    "name": "web",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "lint": "oxlint",
+        "preview": "vite preview",
+        "api:gen": "orval"
+    },
+    "dependencies": {
+        "@ant-design/icons": "^6.3.4",
+        "@geoman-io/leaflet-geoman-free": "^2.20.2",
+        "@hookform/resolvers": "^5.9.1",
+        "@microsoft/signalr": "^10.0.11",
+        "@tanstack/react-query": "^5.104.1",
+        "antd": "^6.6.5",
+        "browser-image-compression": "^2.0.2",
+        "dayjs": "^1.11.23",
+        "exifr": "^7.1.3",
+        "leaflet": "^1.9.4",
+        "leaflet.heat": "^0.2.0",
+        "react": "^19.2.8",
+        "react-dom": "^19.2.8",
+        "react-hook-form": "^7.89.0",
+        "react-leaflet": "^5.0.0",
+        "react-router": "^7.18.4",
+        "recharts": "^3.10.1",
+        "zod": "^4.6.5"
+    },
+    "devDependencies": {
+        "@testing-library/jest-dom": "^6.9.1",
+        "@testing-library/react": "^16.3.3",
+        "@testing-library/user-event": "^14.6.7",
+        "@vitejs/plugin-react": "^6.1.1",
+        "eslint-config-prettier": "^10.1.8",
+        "jsdom": "^29.1.1",
+        "msw": "^2.15.0",
+        "orval": "^7.13.2",
+        "oxlint": "^1.81.0",
+        "prettier": "^3.9.9",
+        "vite": "^8.3.0",
+        "vite-plugin-pwa": "^2.0.0",
+        "vitest": "^4.1.11"
+    },
+    "description": "Đồng Nai GridSmart - giao diện (React + Vite + Ant Design)"
+}

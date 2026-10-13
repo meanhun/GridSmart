@@ -1,0 +1,173 @@
+### Kich ban demo GridSmart theo vai tro (BE-31)
+### Dung voi VS Code REST Client hoac Visual Studio. Mat khau mau o moi truong Development: GridSmart@2026
+@host = http://localhost:5282
+@password = GridSmart@2026
+
+### 0. Suc khoe he thong
+GET {{host}}/health
+
+### ============ CONG DAN (khong can dang nhap) ============
+
+### 1. Danh muc su co
+GET {{host}}/api/public/categories
+
+### 2. Xac nhan vi tri truoc khi gui
+GET {{host}}/api/public/locate?lat=10.955&lon=106.805
+
+### 3. Gui phan anh (multipart). Doi duong dan anh cho phu hop.
+# @name report
+POST {{host}}/api/public/incidents
+Content-Type: multipart/form-data; boundary=GridSmartBoundary
+
+--GridSmartBoundary
+Content-Disposition: form-data; name="latitude"
+
+10.955
+--GridSmartBoundary
+Content-Disposition: form-data; name="longitude"
+
+106.805
+--GridSmartBoundary
+Content-Disposition: form-data; name="description"
+
+Có ổ gà lớn giữa đường
+--GridSmartBoundary
+Content-Disposition: form-data; name="reporterPhone"
+
+0911000001
+--GridSmartBoundary
+Content-Disposition: form-data; name="image"; filename="photo.jpg"
+Content-Type: image/jpeg
+
+< ./sample-photo.jpg
+--GridSmartBoundary--
+
+### 4. Tra cuu tien do bang ma + so dien thoai
+GET {{host}}/api/public/track?code={{report.response.body.trackingCode}}&phone=0911000001
+
+### 5. Danh gia sau khi xu ly xong
+POST {{host}}/api/public/incidents/{{report.response.body.trackingCode}}/rating
+Content-Type: application/json
+
+{ "phone": "0911000001", "rating": 5, "feedback": "Xử lý nhanh" }
+
+### ============ CAN BO O LUOI (officer02 phu trach Khu pho 2, P. Tran Bien) ============
+
+# @name officerLogin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "officer02", "password": "{{password}}" }
+
+###
+@officerToken = {{officerLogin.response.body.accessToken}}
+
+### 6. Viec cua toi (sap theo han SLA)
+# @name myJobs
+GET {{host}}/api/officer/incidents
+Authorization: Bearer {{officerToken}}
+
+### 7. Nhan viec
+POST {{host}}/api/incidents/{{myJobs.response.body.$[0].id}}/accept
+Authorization: Bearer {{officerToken}}
+
+### 8. Nghiem thu bang anh After tai hien truong
+POST {{host}}/api/incidents/{{myJobs.response.body.$[0].id}}/resolve
+Authorization: Bearer {{officerToken}}
+Content-Type: multipart/form-data; boundary=GridSmartBoundary
+
+--GridSmartBoundary
+Content-Disposition: form-data; name="latitude"
+
+10.9551
+--GridSmartBoundary
+Content-Disposition: form-data; name="longitude"
+
+106.8051
+--GridSmartBoundary
+Content-Disposition: form-data; name="note"
+
+Đã vá ổ gà
+--GridSmartBoundary
+Content-Disposition: form-data; name="image"; filename="after.jpg"
+Content-Type: image/jpeg
+
+< ./sample-photo.jpg
+--GridSmartBoundary--
+
+### ============ DIEU PHOI VIEN (cap tinh) ============
+
+# @name dispatcherLogin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "dispatcher01", "password": "{{password}}" }
+
+###
+@dispatcherToken = {{dispatcherLogin.response.body.accessToken}}
+
+### 9. Hang cho duyet
+GET {{host}}/api/incidents?isManualReview=true&status=NEW
+Authorization: Bearer {{dispatcherToken}}
+
+### 10. Can bo trong pham vi de chon khi dieu phoi
+GET {{host}}/api/officers?gridId=1
+Authorization: Bearer {{dispatcherToken}}
+
+### ============ LANH DAO (cap tinh) ============
+
+# @name leaderLogin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "leader.tinh", "password": "{{password}}" }
+
+###
+@leaderToken = {{leaderLogin.response.body.accessToken}}
+
+### 11. Tong quan dieu hanh
+GET {{host}}/api/dashboard/summary
+Authorization: Bearer {{leaderToken}}
+
+### 12. Ban do o luoi (GeoJSON, mau trang thai)
+GET {{host}}/api/dashboard/grid-status
+Authorization: Bearer {{leaderToken}}
+
+### 13. Heatmap 30 ngay
+GET {{host}}/api/dashboard/heatmap
+Authorization: Bearer {{leaderToken}}
+
+### 14. Bao cao theo phuong va KPI can bo
+GET {{host}}/api/reports/by-unit
+Authorization: Bearer {{leaderToken}}
+
+###
+GET {{host}}/api/reports/officer-kpi
+Authorization: Bearer {{leaderToken}}
+
+### 15. Xuat Excel KPI
+GET {{host}}/api/reports/export?type=officer-kpi&format=xlsx
+Authorization: Bearer {{leaderToken}}
+
+### ============ QUAN TRI HE THONG ============
+
+# @name adminLogin
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "username": "admin", "password": "{{password}}" }
+
+###
+@adminToken = {{adminLogin.response.body.accessToken}}
+
+### 16. Cay don vi hanh chinh
+GET {{host}}/api/admin-units/tree
+Authorization: Bearer {{adminToken}}
+
+### 17. Vai tro va quyen
+GET {{host}}/api/roles
+Authorization: Bearer {{adminToken}}
+
+### 18. Tua nhanh SLA de demo leo thang (chi moi truong Demo)
+POST {{host}}/api/demo/incidents/1/fast-forward?minutes=200
+Authorization: Bearer {{adminToken}}

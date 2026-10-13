@@ -1,0 +1,7 @@
+/* Kiểu nền chung. Toàn bộ giao diện dùng Ant Design; không dùng Tailwind. */
+body {
+  margin: 0;
+  background: #FFFFFF;
+  color: #27403E;
+  -webkit-font-smoothing: antialiased;
+}
